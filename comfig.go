@@ -43,5 +43,5 @@ func (c *jacer) ConfigureJac() Jac {
 		}
 
 		return NewJac(config.URL, config.JWT)
-	})
+	}).(Jac)
 }
