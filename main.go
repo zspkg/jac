@@ -34,6 +34,14 @@ type Jac interface {
 
 // JACer is the interface that connector configurator should implement
 type JACer interface {
-	// ConfigureJac returns configured Jac
-	ConfigureJac() Jac
+	//GetJacConfig returns Jac configuration info based on config information
+	// that can be found by specified key. It is useful when you need
+	// to configure multiple connectors to different services.
+	// If jacConfigKey is nil, default config key ``jac`` is used.
+	GetJacConfig(jacConfigKey *string) JacConfig
+	// ConfigureJac returns configured Jac based on config information
+	// that can be found by specified key. It is useful when you need
+	// to configure multiple connectors to different services.
+	// If jacConfigKey is nil, default config key ``jac`` is used.
+	ConfigureJac(jacConfigKey *string) Jac
 }

@@ -7,10 +7,10 @@ import (
 	"gitlab.com/distributed_lab/kit/kv"
 )
 
-const (
-	// jacConfigKey is a key in .config file corresponding
+var (
+	// jacDefaultConfigKey is a key in .config file corresponding
 	// to the Jac configuration
-	jacConfigKey = "jac"
+	jacDefaultConfigKey = "jac"
 )
 
 // jacer is a struct implementing JACer interface
@@ -19,8 +19,8 @@ type jacer struct {
 	getter kv.Getter
 }
 
-// jacConfig contains configurable data of a Jac
-type jacConfig struct {
+// JacConfig contains configurable data of a Jac
+type JacConfig struct {
 	URL string  `fig:"url,required"`
 	JWT *string `fig:"jwt"`
 }
@@ -30,18 +30,28 @@ func NewJACer(getter kv.Getter) JACer {
 	return &jacer{getter: getter}
 }
 
-// ConfigureJac returns configured Jac based on a provided config from kv.Getter
-func (c *jacer) ConfigureJac() Jac {
+// GetJacConfig returns Jac configuration info based on a provided config from kv.Getter
+func (c *jacer) GetJacConfig(configKey *string) JacConfig {
 	return c.once.Do(func() interface{} {
+		if configKey == nil {
+			configKey = &jacDefaultConfigKey
+		}
+
 		var (
-			config = jacConfig{}
-			raw    = kv.MustGetStringMap(c.getter, jacConfigKey)
+			config = JacConfig{}
+			raw    = kv.MustGetStringMap(c.getter, *configKey)
 		)
 
 		if err := figure.Out(&config).From(raw).Please(); err != nil {
 			panic(errors.Wrap(err, "failed to figure out jac"))
 		}
 
-		return NewJac(config.URL, config.JWT)
-	}).(Jac)
+		return config
+	}).(JacConfig)
+}
+
+// ConfigureJac returns configured Jac based on a provided config from kv.Getter
+func (c *jacer) ConfigureJac(configKey *string) Jac {
+	cfg := c.GetJacConfig(configKey)
+	return NewJac(cfg.URL, cfg.JWT)
 }
