@@ -1,11 +1,3 @@
-# JSON API service connector building base
-
-JAC is a building base for custom JSON API service connectors
-
-
-## Usage example
-
-```go
 package examples
 
 import (
@@ -66,52 +58,3 @@ func (c *FooServiceConnector) CreateFoo(foo Foo) (*FooCreateResponse, error) {
 	// Now you can simply return it
 	return &response, nil
 }
-```
-
-Note that you can configure `Jac` directly from config using `JACer`. It uses `Getter` which is responsible for retrieving info from config files and must implement next interface:
-```go
-type Getter interface {
-    GetStringMap(key string) (map[string]interface{}, error)
-}
-```
-
-`JACer` has next methods to configure `Jac` connector or to simply retrieve `Jac` configuration:
-
-```go
-// JacConfig contains configurable data of a Jac
-type JacConfig struct {
-	URL string  `fig:"url,required"`
-	JWT *string `fig:"jwt"`
-}
-
-// NewJACer returns an instance of JACer structure that configures Jac
-func NewJACer(getter kv.Getter) JACer {
-	return &jacer{getter: getter}
-}
-
-// GetJacConfig returns Jac configuration info based on a provided config from kv.Getter
-func (c *jacer) GetJacConfig(configKey *string) JacConfig {
-	return c.once.Do(func() interface{} {
-		if configKey == nil {
-			configKey = &jacDefaultConfigKey
-		}
-
-		var (
-			config = JacConfig{}
-			raw    = kv.MustGetStringMap(c.getter, *configKey)
-		)
-
-		if err := figure.Out(&config).From(raw).Please(); err != nil {
-			panic(errors.Wrap(err, "failed to figure out jac"))
-		}
-
-		return config
-	}).(JacConfig)
-}
-
-// ConfigureJac returns configured Jac based on a provided config from kv.Getter
-func (c *jacer) ConfigureJac(configKey *string) Jac {
-	cfg := c.GetJacConfig(configKey)
-	return NewJac(cfg.URL, cfg.JWT)
-}
-```
