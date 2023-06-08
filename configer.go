@@ -26,6 +26,7 @@ type JacConfig struct {
 }
 
 // NewJACer returns an instance of JACer structure that configures Jac
+// based on a provided config from kv.Getter
 func NewJACer(getter kv.Getter) JACer {
 	return &jacer{getter: getter}
 }

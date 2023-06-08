@@ -15,11 +15,12 @@ import (
 type jac struct {
 	BaseUrl string
 	JWT     *string
+	client  *http.Client
 }
 
 // NewJac returns new jac instance that implements Jac interface
 func NewJac(baseUrl string, jwt *string) Jac {
-	return &jac{baseUrl, jwt}
+	return &jac{baseUrl, jwt, http.DefaultClient}
 }
 
 func (c *jac) Get(endpoint string, destination any) ([]*jsonapi.ErrorObject, error) {
@@ -83,7 +84,8 @@ func (c *jac) perform(method, endpoint string, data []byte, destination any) ([]
 	return nil, nil
 }
 
-// resolveEndpoint forms url by adding endpoint to base url
+// resolveEndpoint forms url by adding endpoint to base url.
+// It ignores possible errors
 func (c *jac) resolveEndpoint(endpoint string) string {
 	result, _ := url.JoinPath(c.BaseUrl, endpoint)
 	return result
@@ -98,12 +100,7 @@ func (c *jac) do(method, endpoint string, data []byte) (*http.Response, error) {
 
 	request = c.setAuthorization(request)
 
-	response, err := http.DefaultClient.Do(request)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to receive response")
-	}
-
-	return response, nil
+	return c.client.Do(request)
 }
 
 // readResponseBody reads response body into destination and returns
