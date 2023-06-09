@@ -32,26 +32,28 @@ func NewJACer(getter kv.Getter) JACer {
 }
 
 // GetJacConfig returns Jac configuration info based on a provided config from kv.Getter
+//   - configKey is a key in .config file corresponding to the Jac configuration.
+//     If nil, then default key is used
 func (c *jacer) GetJacConfig(configKey *string) JacConfig {
-	return c.once.Do(func() interface{} {
-		if configKey == nil {
-			configKey = &jacDefaultConfigKey
-		}
+	if configKey == nil {
+		configKey = &jacDefaultConfigKey
+	}
 
-		var (
-			config = JacConfig{}
-			raw    = kv.MustGetStringMap(c.getter, *configKey)
-		)
+	var (
+		config = JacConfig{}
+		raw    = kv.MustGetStringMap(c.getter, *configKey)
+	)
 
-		if err := figure.Out(&config).From(raw).Please(); err != nil {
-			panic(errors.Wrap(err, "failed to figure out jac"))
-		}
+	if err := figure.Out(&config).From(raw).Please(); err != nil {
+		panic(errors.Wrap(err, "failed to figure out jac"))
+	}
 
-		return config
-	}).(JacConfig)
+	return config
 }
 
 // ConfigureJac returns configured Jac based on a provided config from kv.Getter
+//   - configKey is a key in .config file corresponding to the Jac configuration.
+//     If nil, then default key is used
 func (c *jacer) ConfigureJac(configKey *string) Jac {
 	cfg := c.GetJacConfig(configKey)
 	return NewJac(cfg.URL, cfg.JWT)
