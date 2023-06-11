@@ -1,0 +1,3 @@
+my-connector-name:
+  url: http://localhost:8001
+  jwt: my-worst-jwt

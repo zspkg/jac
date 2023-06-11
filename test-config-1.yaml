@@ -1,0 +1,3 @@
+jac:
+  url: http://localhost:8000
+  jwt: my-coolest-jwt
