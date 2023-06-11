@@ -1,7 +1,8 @@
 # JSON API service connector building base
+[![codecov](https://codecov.io/github/zspkg/jac/branch/main/graph/badge.svg?token=JO5Qd0Zw20)](https://codecov.io/github/zspkg/jac)
+[![Go Report Card](https://goreportcard.com/badge/github.com/zspkg/jac)](https://goreportcard.com/report/github.com/zspkg/jac)
 
 JAC is a building base for custom JSON API service connectors
-
 
 ## Usage example
 
