@@ -1,0 +1,112 @@
+# github.com/certifi/gocertifi v0.0.0-20210507211836-431795d63e8d
+## explicit; go 1.12
+github.com/certifi/gocertifi
+# github.com/davecgh/go-spew v1.1.1
+## explicit
+github.com/davecgh/go-spew/spew
+# github.com/fsnotify/fsnotify v1.4.7
+## explicit
+github.com/fsnotify/fsnotify
+# github.com/getsentry/raven-go v0.2.0
+## explicit
+github.com/getsentry/raven-go
+# github.com/getsentry/sentry-go v0.7.0
+## explicit; go 1.12
+github.com/getsentry/sentry-go
+# github.com/go-chi/chi v4.1.2+incompatible
+## explicit
+github.com/go-chi/chi
+github.com/go-chi/chi/middleware
+# github.com/go-ozzo/ozzo-validation/v4 v4.3.0
+## explicit; go 1.13
+github.com/go-ozzo/ozzo-validation/v4
+# github.com/google/jsonapi v1.0.0
+## explicit
+github.com/google/jsonapi
+# github.com/hashicorp/hcl v1.0.0
+## explicit
+github.com/hashicorp/hcl
+github.com/hashicorp/hcl/hcl/ast
+github.com/hashicorp/hcl/hcl/parser
+github.com/hashicorp/hcl/hcl/printer
+github.com/hashicorp/hcl/hcl/scanner
+github.com/hashicorp/hcl/hcl/strconv
+github.com/hashicorp/hcl/hcl/token
+github.com/hashicorp/hcl/json/parser
+github.com/hashicorp/hcl/json/scanner
+github.com/hashicorp/hcl/json/token
+# github.com/magiconair/properties v1.8.0
+## explicit
+github.com/magiconair/properties
+# github.com/mitchellh/mapstructure v1.1.2
+## explicit
+github.com/mitchellh/mapstructure
+# github.com/oklog/ulid v1.3.1
+## explicit
+github.com/oklog/ulid
+# github.com/pelletier/go-toml v1.2.0
+## explicit
+github.com/pelletier/go-toml
+# github.com/pkg/errors v0.9.1
+## explicit
+github.com/pkg/errors
+# github.com/pmezard/go-difflib v1.0.0
+## explicit
+github.com/pmezard/go-difflib/difflib
+# github.com/sirupsen/logrus v1.9.3
+## explicit; go 1.13
+github.com/sirupsen/logrus
+# github.com/spf13/afero v1.1.2
+## explicit
+github.com/spf13/afero
+github.com/spf13/afero/mem
+# github.com/spf13/cast v1.3.0
+## explicit
+github.com/spf13/cast
+# github.com/spf13/jwalterweatherman v1.0.0
+## explicit
+github.com/spf13/jwalterweatherman
+# github.com/spf13/pflag v1.0.3
+## explicit
+github.com/spf13/pflag
+# github.com/spf13/viper v1.3.2
+## explicit
+github.com/spf13/viper
+# github.com/stretchr/testify v1.8.4
+## explicit; go 1.20
+github.com/stretchr/testify/assert
+# gitlab.com/distributed_lab/ape v1.7.1
+## explicit; go 1.14
+gitlab.com/distributed_lab/ape
+gitlab.com/distributed_lab/ape/problems
+# gitlab.com/distributed_lab/figure v2.1.0+incompatible
+## explicit
+gitlab.com/distributed_lab/figure
+# gitlab.com/distributed_lab/kit v1.11.2
+## explicit; go 1.14
+gitlab.com/distributed_lab/kit/comfig
+gitlab.com/distributed_lab/kit/kv
+# gitlab.com/distributed_lab/logan v3.8.1+incompatible
+## explicit
+gitlab.com/distributed_lab/logan/v3
+gitlab.com/distributed_lab/logan/v3/errors
+gitlab.com/distributed_lab/logan/v3/fields
+gitlab.com/distributed_lab/logan/v3/hook/sentry
+# gitlab.com/distributed_lab/lorem v0.2.1
+## explicit
+gitlab.com/distributed_lab/lorem
+# golang.org/x/sys v0.8.0
+## explicit; go 1.17
+golang.org/x/sys/internal/unsafeheader
+golang.org/x/sys/unix
+golang.org/x/sys/windows
+# golang.org/x/text v0.3.3
+## explicit; go 1.11
+golang.org/x/text/transform
+golang.org/x/text/unicode/norm
+# gopkg.in/yaml.v2 v2.2.8
+## explicit
+gopkg.in/yaml.v2
+# gopkg.in/yaml.v3 v3.0.1
+## explicit
+gopkg.in/yaml.v3
