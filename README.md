@@ -1,4 +1,5 @@
 # JSON API service connector building base
+[![Go Reference](https://pkg.go.dev/badge/github.com/zspkg/jac#section-readme.svg)](https://pkg.go.dev/github.com/zspkg/jac#section-readme)
 [![codecov](https://codecov.io/github/zspkg/jac/branch/main/graph/badge.svg?token=JO5Qd0Zw20)](https://codecov.io/github/zspkg/jac)
 [![Go Report Card](https://goreportcard.com/badge/github.com/zspkg/jac)](https://goreportcard.com/report/github.com/zspkg/jac)
 
