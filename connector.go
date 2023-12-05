@@ -87,8 +87,8 @@ func (c *jac) perform(method, endpoint string, data []byte, destination any) ([]
 // resolveEndpoint forms url by adding endpoint to base url.
 // It ignores possible errors
 func (c *jac) resolveEndpoint(endpoint string) string {
-	result, _ := url.JoinPath(c.BaseUrl, endpoint)
-	return result
+	link, _ := url.Parse(fmt.Sprintf("%s%s", c.BaseUrl, endpoint))
+	return link.String()
 }
 
 // do sends specified request to specified endpoint based on received method and data
