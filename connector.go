@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/google/jsonapi"
-	"gitlab.com/distributed_lab/logan/v3/errors"
 	"io"
 	"net/http"
 	"net/url"
+
+	"github.com/google/jsonapi"
+	"gitlab.com/distributed_lab/logan/v3"
+	"gitlab.com/distributed_lab/logan/v3/errors"
 )
 
 // jac is a structure that implements Jac interface
@@ -67,7 +69,12 @@ func (c *jac) NotExists(endpoint string) (bool, error) {
 
 // perform performs a request based on given parameters
 func (c *jac) perform(method, endpoint string, data []byte, destination any) ([]*jsonapi.ErrorObject, error) {
-	response, err := c.do(method, c.resolveEndpoint(endpoint), data)
+	resolvedEndpoint, err := c.resolveEndpoint(endpoint)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to resolve endpoint")
+	}
+
+	response, err := c.do(method, resolvedEndpoint, data)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to send request")
 	}
@@ -86,9 +93,23 @@ func (c *jac) perform(method, endpoint string, data []byte, destination any) ([]
 
 // resolveEndpoint forms url by adding endpoint to base url.
 // It ignores possible errors
-func (c *jac) resolveEndpoint(endpoint string) string {
-	link, _ := url.Parse(fmt.Sprintf("%s%s", c.BaseUrl, endpoint))
-	return link.String()
+func (c *jac) resolveEndpoint(endpoint string) (string, error) {
+	joinedPath, err := url.JoinPath(c.BaseUrl, endpoint)
+	if err != nil {
+		return "", errors.Wrap(err, "failed to join path", logan.F{
+			"base":     c.BaseUrl,
+			"endpoint": endpoint,
+		})
+	}
+
+	decodedURL, err := url.QueryUnescape(joinedPath)
+	if err != nil {
+		return "", errors.Wrap(err, "failed to decode escape URL characters", logan.F{
+			"joined_path": joinedPath,
+		})
+	}
+
+	return decodedURL, nil
 }
 
 // do sends specified request to specified endpoint based on received method and data
