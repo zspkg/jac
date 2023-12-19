@@ -2,6 +2,7 @@ package examples
 
 import (
 	"encoding/json"
+
 	"github.com/zspkg/jac"
 )
 
@@ -25,9 +26,9 @@ type FooCreateResponse struct {
 // NewFooServiceConnector is your custom connector to FooService where
 // you can define your own data transformations and operations and
 // then use jac.Jac's methods to easily send POST/GET/DELETE methods
-func NewFooServiceConnector(baseEndpoint string, jwt *string) *FooServiceConnector {
+func NewFooServiceConnector(baseEndpoint string) *FooServiceConnector {
 	return &FooServiceConnector{
-		jac.NewJac(baseEndpoint, jwt),
+		jac.NewJac(baseEndpoint),
 		"foo/create",
 	}
 }
@@ -46,7 +47,13 @@ func (c *FooServiceConnector) CreateFoo(foo Foo) (*FooCreateResponse, error) {
 
 	// sending POST request to our service via connector
 	// to create new Foo instance
-	apiErrs, err := c.Post(c.createFooEndpoint, rawFoo, &response)
+	apiErrs, err := c.Post(
+		jac.RequestParams{
+			Endpoint: c.createFooEndpoint,
+			Body:     rawFoo,
+		},
+		&response,
+	)
 	if err != nil {
 		// your custom error handling
 	}
