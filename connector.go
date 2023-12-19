@@ -16,13 +16,12 @@ import (
 // jac is a structure that implements Jac interface
 type jac struct {
 	BaseUrl string
-	JWT     *string
 	client  *http.Client
 }
 
 // NewJac returns new jac instance that implements Jac interface
-func NewJac(baseUrl string, jwt *string) Jac {
-	return &jac{baseUrl, jwt, http.DefaultClient}
+func NewJac(baseUrl string) Jac {
+	return &jac{baseUrl, http.DefaultClient}
 }
 
 func (c *jac) Get(params RequestParams, destination any) ([]*jsonapi.ErrorObject, error) {
@@ -113,7 +112,6 @@ func (c *jac) do(params RequestParams) (*http.Response, error) {
 		return nil, errors.Wrap(err, "failed to create a request")
 	}
 
-	request = c.setAuthorization(request)
 	request = params.addRequestHeaders(request)
 	request = params.addRequestQuery(request)
 
@@ -155,15 +153,4 @@ func (c *jac) readResponseBody(response *http.Response, destination any) (
 
 	err = json.Unmarshal(raw, &destination)
 	return nil, err
-}
-
-// setAuthorization sets JWT to the Authorization header.
-// If no JWT token were provided, function simply returns unmodified request
-func (c *jac) setAuthorization(r *http.Request) *http.Request {
-	if c.JWT == nil {
-		return r
-	}
-
-	r.Header.Add("Authorization", fmt.Sprintf("Bearer %s", *c.JWT))
-	return r
 }

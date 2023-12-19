@@ -11,7 +11,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
-	"gitlab.com/distributed_lab/kit/kv"
 )
 
 // -- Test API --
@@ -82,15 +81,13 @@ func newTestRouter() chi.Router {
 
 const (
 	testUrlBase = "/integrations/some-logic"
-	testConfig  = "test-config-1.yaml"
 )
 
 var testRouter = newTestRouter()
 
 func getTestJac(server *httptest.Server) Jac {
 	var (
-		testJacCfg = NewJACer(kv.NewViperFile(testConfig)).GetJacConfig(nil)
-		testJac    = NewJac(server.URL, testJacCfg.JWT)
+		testJac = NewJac(server.URL)
 	)
 
 	return testJac
