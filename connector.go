@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/google/jsonapi"
-	"gitlab.com/distributed_lab/logan/v3/errors"
 	"io"
 	"net/http"
 	"net/url"
+
+	"github.com/google/jsonapi"
+	"gitlab.com/distributed_lab/logan/v3/errors"
 )
 
 // jac is a structure that implements Jac interface
@@ -23,7 +24,8 @@ func NewJac(baseUrl string, jwt *string) Jac {
 	return &jac{baseUrl, jwt, http.DefaultClient}
 }
 
-func (c *jac) Get(endpoint string, destination any) ([]*jsonapi.ErrorObject, error) {
+// func (c *jac) Get(endpoint string, destination any) ([]*jsonapi.ErrorObject, error) {
+func (c *jac) Get(params RequestParams) ([]*jsonapi.ErrorObject, error) {
 	return c.perform(http.MethodGet, endpoint, nil, destination)
 }
 
@@ -66,13 +68,14 @@ func (c *jac) NotExists(endpoint string) (bool, error) {
 }
 
 // perform performs a request based on given parameters
-func (c *jac) perform(method, endpoint string, data []byte, destination any) ([]*jsonapi.ErrorObject, error) {
-	response, err := c.do(method, c.resolveEndpoint(endpoint), data)
+// func (c *jac) perform(method, endpoint string, data []byte, destination any) ([]*jsonapi.ErrorObject, error) {
+func (c *jac) perform(params RequestParams) ([]*jsonapi.ErrorObject, error) {
+	response, err := c.do(params)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to send request")
 	}
 
-	errsPayload, err := c.readResponseBody(response, destination)
+	errsPayload, err := c.readResponseBody(response, params.Destination)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read response body")
 	}
@@ -92,7 +95,7 @@ func (c *jac) resolveEndpoint(endpoint string) string {
 }
 
 // do sends specified request to specified endpoint based on received method and data
-func (c *jac) do(method, endpoint string, data []byte) (*http.Response, error) {
+func (c *jac) do(params RequestParams) (*http.Response, error) {
 	request, err := http.NewRequest(method, endpoint, bytes.NewReader(data))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create a request")
