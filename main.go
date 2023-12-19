@@ -7,17 +7,17 @@ type Jac interface {
 	// Get sends GET request and reads response body into destination.
 	// Returns a slice of API error objects according to JSON API or
 	// error if some happened during the operation.
-	Get(params RequestParams) ([]*jsonapi.ErrorObject, error)
+	Get(params RequestParams, destination any) ([]*jsonapi.ErrorObject, error)
 	// Post sends POST request with provided data as a request body
 	// and reads response body if some data is expected to return.
 	// Returns a slice of API error objects according to JSON API or
 	// error if some happened during the operation.
-	Post(params RequestParams) ([]*jsonapi.ErrorObject, error)
+	Post(params RequestParams, destination any) ([]*jsonapi.ErrorObject, error)
 	// Patch sends PATCH request with provided data as a request body
 	// and reads response body if some data is expected to return.
 	// Returns a slice of API error objects according to JSON API or
 	// error if some happened during the operation.
-	Patch(params RequestParams) ([]*jsonapi.ErrorObject, error)
+	Patch(params RequestParams, destination any) ([]*jsonapi.ErrorObject, error)
 	// Delete sends DELETE request.
 	// Returns a slice of API error objects according to JSON API or
 	// error if some happened during the operation.
