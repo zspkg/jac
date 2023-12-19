@@ -21,8 +21,7 @@ type jacer struct {
 
 // JacConfig contains configurable data of a Jac
 type JacConfig struct {
-	URL string  `fig:"url,required"`
-	JWT *string `fig:"jwt"`
+	URL string `fig:"url,required"`
 }
 
 // NewJACer returns an instance of JACer structure that configures Jac
@@ -56,5 +55,5 @@ func (c *jacer) GetJacConfig(configKey *string) JacConfig {
 //     If nil, then default key is used
 func (c *jacer) ConfigureJac(configKey *string) Jac {
 	cfg := c.GetJacConfig(configKey)
-	return NewJac(cfg.URL, cfg.JWT)
+	return NewJac(cfg.URL)
 }

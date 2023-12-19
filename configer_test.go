@@ -1,9 +1,10 @@
 package jac
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"gitlab.com/distributed_lab/kit/kv"
-	"testing"
 )
 
 const (
@@ -16,10 +17,8 @@ func TestJacer_GetJacConfig(t *testing.T) {
 		myJacer := NewJACer(kv.NewViperFile(jacTestConfigKey1))
 		jacCfg := myJacer.GetJacConfig(nil)
 
-		expectJwt := "my-coolest-jwt"
 		assert.Equal(t, JacConfig{
 			URL: "http://localhost:8000",
-			JWT: &expectJwt,
 		}, jacCfg)
 	})
 
@@ -28,10 +27,8 @@ func TestJacer_GetJacConfig(t *testing.T) {
 		jacCfgKey := "my-connector-name"
 		jacCfg := myJacer.GetJacConfig(&jacCfgKey)
 
-		expectJwt := "my-worst-jwt"
 		assert.Equal(t, JacConfig{
 			URL: "http://localhost:8001",
-			JWT: &expectJwt,
 		}, jacCfg)
 	})
 

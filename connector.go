@@ -4,43 +4,44 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/google/jsonapi"
-	"gitlab.com/distributed_lab/logan/v3/errors"
 	"io"
 	"net/http"
 	"net/url"
+
+	"github.com/google/jsonapi"
+	"gitlab.com/distributed_lab/logan/v3"
+	"gitlab.com/distributed_lab/logan/v3/errors"
 )
 
 // jac is a structure that implements Jac interface
 type jac struct {
 	BaseUrl string
-	JWT     *string
 	client  *http.Client
 }
 
 // NewJac returns new jac instance that implements Jac interface
-func NewJac(baseUrl string, jwt *string) Jac {
-	return &jac{baseUrl, jwt, http.DefaultClient}
+func NewJac(baseUrl string) Jac {
+	return &jac{baseUrl, http.DefaultClient}
 }
 
-func (c *jac) Get(endpoint string, destination any) ([]*jsonapi.ErrorObject, error) {
-	return c.perform(http.MethodGet, endpoint, nil, destination)
+func (c *jac) Get(params RequestParams, destination any) ([]*jsonapi.ErrorObject, error) {
+	return c.perform(params.addMethod(http.MethodGet), destination)
 }
 
-func (c *jac) Post(endpoint string, data []byte, destination any) ([]*jsonapi.ErrorObject, error) {
-	return c.perform(http.MethodPost, endpoint, data, destination)
+func (c *jac) Post(params RequestParams, destination any) ([]*jsonapi.ErrorObject, error) {
+	return c.perform(params.addMethod(http.MethodPost), destination)
 }
 
-func (c *jac) Patch(endpoint string, data []byte, destination any) ([]*jsonapi.ErrorObject, error) {
-	return c.perform(http.MethodPatch, endpoint, data, destination)
+func (c *jac) Patch(params RequestParams, destination any) ([]*jsonapi.ErrorObject, error) {
+	return c.perform(params.addMethod(http.MethodPatch), destination)
 }
 
-func (c *jac) Delete(endpoint string) ([]*jsonapi.ErrorObject, error) {
-	return c.perform(http.MethodDelete, endpoint, nil, nil)
+func (c *jac) Delete(params RequestParams) ([]*jsonapi.ErrorObject, error) {
+	return c.perform(params.addMethod(http.MethodDelete), nil)
 }
 
-func (c *jac) Exists(endpoint string) (bool, error) {
-	jsonErrs, err := c.Get(endpoint, nil)
+func (c *jac) Exists(params RequestParams) (bool, error) {
+	jsonErrs, err := c.Get(params, nil)
 	if err != nil {
 		return false, errors.Wrap(err, "failed to validate if object exists")
 	}
@@ -60,14 +61,15 @@ func (c *jac) Exists(endpoint string) (bool, error) {
 	return true, err
 }
 
-func (c *jac) NotExists(endpoint string) (bool, error) {
-	exists, err := c.Exists(endpoint)
+func (c *jac) NotExists(params RequestParams) (bool, error) {
+	exists, err := c.Exists(params)
 	return exists == false, err
 }
 
 // perform performs a request based on given parameters
-func (c *jac) perform(method, endpoint string, data []byte, destination any) ([]*jsonapi.ErrorObject, error) {
-	response, err := c.do(method, c.resolveEndpoint(endpoint), data)
+// func (c *jac) perform(method, endpoint string, data []byte, destination any) ([]*jsonapi.ErrorObject, error) {
+func (c *jac) perform(params RequestParams, destination any) ([]*jsonapi.ErrorObject, error) {
+	response, err := c.do(params)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to send request")
 	}
@@ -86,19 +88,32 @@ func (c *jac) perform(method, endpoint string, data []byte, destination any) ([]
 
 // resolveEndpoint forms url by adding endpoint to base url.
 // It ignores possible errors
-func (c *jac) resolveEndpoint(endpoint string) string {
-	result, _ := url.JoinPath(c.BaseUrl, endpoint)
-	return result
+func (c *jac) resolveEndpoint(endpoint string) (string, error) {
+	result, err := url.JoinPath(c.BaseUrl, endpoint)
+	if err != nil {
+		return "", errors.Wrap(err, "failed to join path", logan.F{
+			"base":     c.BaseUrl,
+			"endpoint": endpoint,
+		})
+	}
+
+	return result, nil
 }
 
 // do sends specified request to specified endpoint based on received method and data
-func (c *jac) do(method, endpoint string, data []byte) (*http.Response, error) {
-	request, err := http.NewRequest(method, endpoint, bytes.NewReader(data))
+func (c *jac) do(params RequestParams) (*http.Response, error) {
+	endpoint, err := c.resolveEndpoint(params.Endpoint)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to resolve endpoint")
+	}
+
+	request, err := http.NewRequest(params.method, endpoint, bytes.NewReader(params.Body))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create a request")
 	}
 
-	request = c.setAuthorization(request)
+	request = params.addRequestHeaders(request)
+	request = params.addRequestQuery(request)
 
 	return c.client.Do(request)
 }
@@ -138,15 +153,4 @@ func (c *jac) readResponseBody(response *http.Response, destination any) (
 
 	err = json.Unmarshal(raw, &destination)
 	return nil, err
-}
-
-// setAuthorization sets JWT to the Authorization header.
-// If no JWT token were provided, function simply returns unmodified request
-func (c *jac) setAuthorization(r *http.Request) *http.Request {
-	if c.JWT == nil {
-		return r
-	}
-
-	r.Header.Add("Authorization", fmt.Sprintf("Bearer %s", *c.JWT))
-	return r
 }

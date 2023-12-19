@@ -3,14 +3,14 @@ package jac
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
 	"github.com/go-chi/chi"
 	"github.com/stretchr/testify/assert"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
-	"gitlab.com/distributed_lab/kit/kv"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 )
 
 // -- Test API --
@@ -81,15 +81,13 @@ func newTestRouter() chi.Router {
 
 const (
 	testUrlBase = "/integrations/some-logic"
-	testConfig  = "test-config-1.yaml"
 )
 
 var testRouter = newTestRouter()
 
 func getTestJac(server *httptest.Server) Jac {
 	var (
-		testJacCfg = NewJACer(kv.NewViperFile(testConfig)).GetJacConfig(nil)
-		testJac    = NewJac(server.URL, testJacCfg.JWT)
+		testJac = NewJac(server.URL)
 	)
 
 	return testJac
@@ -103,7 +101,7 @@ func TestJacer_Get(t *testing.T) {
 
 	t.Run("get request", func(t *testing.T) {
 		var testResponse getTestResponse
-		_, err := testJac.Get(testUrlBase, &testResponse)
+		_, err := testJac.Get(RequestParams{Endpoint: testUrlBase}, &testResponse)
 		assert.Nil(t, err, "expected nil error when unmarshalling response")
 		assert.Equal(t, getTestResponse{Foo: "bar"}, testResponse)
 	})
@@ -126,13 +124,25 @@ func TestJacer_Post(t *testing.T) {
 
 	t.Run("post add request", func(t *testing.T) {
 		var testAddResponse postTestResponse
-		_, err = testJac.Post(fmt.Sprintf("%s/%s", testUrlBase, "add"), requestAsBytes, &testAddResponse)
+		_, err = testJac.Post(
+			RequestParams{
+				Endpoint: fmt.Sprintf("%s/%s", testUrlBase, "add"),
+				Body:     requestAsBytes,
+			},
+			&testAddResponse,
+		)
 		assert.Nil(t, err, "expected nil error when unmarshalling add response")
 		assert.Equal(t, testAddResponse, testAddExpectedResponse)
 	})
 	t.Run("post multiply request", func(t *testing.T) {
 		var testMultiplyResponse postTestResponse
-		_, err = testJac.Post(fmt.Sprintf("%s/%s", testUrlBase, "multiply"), requestAsBytes, &testMultiplyResponse)
+		_, err = testJac.Post(
+			RequestParams{
+				Endpoint: fmt.Sprintf("%s/%s", testUrlBase, "multiply"),
+				Body:     requestAsBytes,
+			},
+			&testMultiplyResponse,
+		)
 		assert.Nil(t, err, "expected nil error when unmarshalling multiply response")
 		assert.Equal(t, testMultiplyResponse, testMultiplyExpectedResponse)
 	})
